@@ -7,6 +7,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const ctx = canvasEl.getContext("2d");
   const ship = new Ship();
-  ship.drawOrbit(ctx);
-  ship.drawHead(ctx);
+  ship.start(ctx);
 });
