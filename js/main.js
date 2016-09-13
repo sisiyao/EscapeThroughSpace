@@ -1,11 +1,11 @@
-import Ship from './ship';
+import Maze from './maze';
 
 document.addEventListener("DOMContentLoaded", () => {
-  const canvasEl = document.getElementsByTagName("canvas")[0];
-  canvasEl.width = 1000;
-  canvasEl.height = 600;
+  const canvas = document.getElementsByTagName("canvas")[0];
+  canvas.width = 1000;
+  canvas.height = 600;
 
-  const ctx = canvasEl.getContext("2d");
-  const ship = new Ship();
-  ship.start(ctx);
+  const ctx = canvas.getContext("2d");
+  const maze = new Maze(1, ctx, canvas.width, canvas.height);
+  maze.start();
 });

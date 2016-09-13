@@ -40,32 +40,30 @@
 /******/ 	return __webpack_require__(0);
 /******/ })
 /************************************************************************/
-/******/ ({
-
-/***/ 0:
+/******/ ([
+/* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _ship = __webpack_require__(1);
+	var _maze = __webpack_require__(3);
 
-	var _ship2 = _interopRequireDefault(_ship);
+	var _maze2 = _interopRequireDefault(_maze);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	document.addEventListener("DOMContentLoaded", function () {
-	  var canvasEl = document.getElementsByTagName("canvas")[0];
-	  canvasEl.width = 1000;
-	  canvasEl.height = 600;
+	  var canvas = document.getElementsByTagName("canvas")[0];
+	  canvas.width = 1000;
+	  canvas.height = 600;
 
-	  var ctx = canvasEl.getContext("2d");
-	  var ship = new _ship2.default();
-	  ship.start(ctx);
+	  var ctx = canvas.getContext("2d");
+	  var maze = new _maze2.default(1, ctx, canvas.width, canvas.height);
+	  maze.start();
 	});
 
 /***/ },
-
-/***/ 1:
+/* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -74,9 +72,12 @@
 	  value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // x = cx + r * cos(a)
+	// y = cy + r * sin(a)
+	// cx = x - r * cos(a)
+	// cy = y - r * sin(a)
 
-	var _lodash = __webpack_require__(76);
+	var _lodash = __webpack_require__(2);
 
 	var _lodash2 = _interopRequireDefault(_lodash);
 
@@ -84,42 +85,43 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var SHIP_CONSTANTS = {
-	  CENTER: [150, 150],
+	var PLAYER_CONSTANTS = {
 	  RADIUS: 55,
 	  HEAD_RADIUS: 12,
-	  COLOR: '#FF0000',
-	  ORBIT_COLOR: '#cdcdcd'
+	  COLOR: '#FF0000'
 	};
 
-	var Ship = function () {
-	  function Ship(ctx) {
-	    _classCallCheck(this, Ship);
+	var Player = function () {
+	  function Player(center) {
+	    _classCallCheck(this, Player);
 
-	    this.center = SHIP_CONSTANTS.CENTER;
-	    this.radius = SHIP_CONSTANTS.RADIUS;
-	    this.headCenter = this.pointOnOrbit(0, SHIP_CONSTANTS.CENTER, SHIP_CONSTANTS.RADIUS);
-	    this.headRadius = SHIP_CONSTANTS.HEAD_RADIUS;
+	    this.center = center;
+	    this.radius = PLAYER_CONSTANTS.RADIUS;
+	    this.headCenter = this.pointOnOrbit(0, center, PLAYER_CONSTANTS.RADIUS);
+	    this.headRadius = PLAYER_CONSTANTS.HEAD_RADIUS;
 	    this.tail = this.initialTail();
-	    this.color = SHIP_CONSTANTS.COLOR;
+	    this.color = PLAYER_CONSTANTS.COLOR;
 	    this.angle = 0;
+	    this.direction = 'counter-clockwise';
 
-	    (0, _lodash2.default)(this, ['drawOrbit', 'drawHead', 'drawTail', 'rotate']);
+	    (0, _lodash2.default)(this, ['drawHead', 'drawTail', 'rotate', 'switchAngles', 'calculateCenter', 'turnClockwise', 'turnCounterClockwise']);
 	  }
 
-	  _createClass(Ship, [{
+	  _createClass(Player, [{
 	    key: 'pointOnOrbit',
 	    value: function pointOnOrbit(angle, center, radius) {
 	      return [center[0] + radius * Math.cos(angle), center[1] + radius * Math.sin(angle)];
 	    }
-	  }, {
-	    key: 'drawOrbit',
-	    value: function drawOrbit(ctx) {
-	      ctx.fillStyle = SHIP_CONSTANTS.ORBIT_COLOR;
-	      ctx.beginPath();
-	      ctx.arc(this.center[0], this.center[1], this.radius, 0, 2 * Math.PI, true);
-	      ctx.fill();
-	    }
+
+	    // drawOrbit (ctx) {
+	    //   ctx.fillStyle = PLAYER_CONSTANTS.ORBIT_COLOR;
+	    //   ctx.beginPath();
+	    //   ctx.arc(
+	    //     this.center[0], this.center[1], this.radius, 0, 2 * Math.PI, true
+	    //   );
+	    //   ctx.fill();
+	    // }
+
 	  }, {
 	    key: 'drawHead',
 	    value: function drawHead(ctx) {
@@ -131,12 +133,10 @@
 	  }, {
 	    key: 'initialTail',
 	    value: function initialTail() {
-	      // interval = 2PI / 120
-	      // 60/9
 	      var tail = [];
 	      var angle = 2 * Math.PI;
-	      for (var i = 0; i <= 50; i++) {
-	        angle -= 2 * Math.PI / 120;
+	      for (var i = 0; i <= 40; i++) {
+	        angle += 2 * Math.PI / 90;
 	        var point = this.pointOnOrbit(angle, this.center, this.radius);
 	        tail.push(point);
 	      }
@@ -146,7 +146,7 @@
 	    key: 'drawTail',
 	    value: function drawTail(ctx) {
 	      var radius = this.headRadius;
-	      for (var i = 8; i <= 47; i += 7) {
+	      for (var i = 7; i <= 40; i += 9) {
 	        radius *= 0.7;
 	        ctx.fillStyle = this.color;
 	        ctx.beginPath();
@@ -157,50 +157,51 @@
 	  }, {
 	    key: 'rotate',
 	    value: function rotate() {
-	      this.angle = this.angle === 2 * Math.PI ? 2 * Math.PI / 120 : this.angle + 2 * Math.PI / 120;
-	      this.headCenter = this.pointOnOrbit(this.angle, this.center, this.radius);
+	      if (this.direction === 'clockwise') {
+	        this.angle = this.angle === 2 * Math.PI ? 2 * Math.PI / 100 : this.angle + 2 * Math.PI / 80;
+	      } else {
+	        this.angle = this.angle === 0 ? 2 * Math.PI - 2 * Math.PI / 100 : this.angle - 2 * Math.PI / 80;
+	      }
 
+	      this.headCenter = this.pointOnOrbit(this.angle, this.center, this.radius);
 	      this.tail.pop();
 	      this.tail.unshift(this.headCenter);
 	    }
 	  }, {
-	    key: 'move',
-	    value: function move() {}
+	    key: 'switchAngles',
+	    value: function switchAngles() {
+	      this.angle = (this.angle + Math.PI) % (2 * Math.PI);
+	    }
 	  }, {
-	    key: 'bindKey',
-	    value: function bindKey() {}
-	    // key("space", () => { this.move() });
-
-
-	    // testing purposes
-
+	    key: 'calculateCenter',
+	    value: function calculateCenter() {
+	      this.center = [this.headCenter[0] - this.radius * Math.cos(this.angle), this.headCenter[1] - this.radius * Math.sin(this.angle)];
+	    }
 	  }, {
-	    key: 'start',
-	    value: function start(ctx) {
-	      var _this = this;
-
-	      var animateCallback = function animateCallback() {
-	        ctx.clearRect(0, 0, 1000, 600);
-	        _this.drawOrbit(ctx);
-	        _this.drawHead(ctx);
-	        _this.drawTail(ctx);
-	        _this.rotate();
-
-	        requestAnimationFrame(animateCallback);
-	      };
-
-	      animateCallback();
+	    key: 'turnClockwise',
+	    value: function turnClockwise() {
+	      if (this.direction !== 'clockwise') {
+	        this.direction = 'clockwise';
+	        this.switchAngles();
+	        this.calculateCenter();
+	      }
+	    }
+	  }, {
+	    key: 'turnCounterClockwise',
+	    value: function turnCounterClockwise() {
+	      this.direction = 'counter-clockwise';
+	      this.switchAngles();
+	      this.calculateCenter();
 	    }
 	  }]);
 
-	  return Ship;
+	  return Player;
 	}();
 
-	exports.default = Ship;
+	exports.default = Player;
 
 /***/ },
-
-/***/ 76:
+/* 2 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -1716,6 +1717,191 @@
 
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
-/***/ }
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
 
-/******/ });
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _player = __webpack_require__(1);
+
+	var _player2 = _interopRequireDefault(_player);
+
+	var _wall = __webpack_require__(4);
+
+	var _wall2 = _interopRequireDefault(_wall);
+
+	var _levels = __webpack_require__(5);
+
+	var _levels2 = _interopRequireDefault(_levels);
+
+	var _lodash = __webpack_require__(2);
+
+	var _lodash2 = _interopRequireDefault(_lodash);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Maze = function () {
+	  function Maze(level, ctx, width, height) {
+	    _classCallCheck(this, Maze);
+
+	    this.player = new _player2.default(_levels2.default[level].playerStart);
+	    this.ctx = ctx;
+	    this.walls = _levels2.default[level].walls.map(function (wall) {
+	      return new _wall2.default(wall);
+	    });
+	    this.endGoal = new _wall2.default(_levels2.default[level].endGoal);
+	    this.width = width;
+	    this.height = height;
+
+	    (0, _lodash2.default)(this, ['drawWalls', 'borderCollision', 'wallCollision']);
+	  }
+
+	  _createClass(Maze, [{
+	    key: 'bindKeys',
+	    value: function bindKeys() {
+	      Mousetrap.bind("space", this.player.turnClockwise, 'keydown');
+	      Mousetrap.bind("space", this.player.turnCounterClockwise, 'keyup');
+	    }
+	  }, {
+	    key: 'drawWalls',
+	    value: function drawWalls() {
+	      var _this = this;
+
+	      this.walls.forEach(function (wall) {
+	        wall.draw(_this.ctx, '#cdcdcd');
+	      });
+	    }
+	  }, {
+	    key: 'drawEndGoal',
+	    value: function drawEndGoal() {
+	      this.endGoal.draw(this.ctx, '#cdcdcd');
+	    }
+	  }, {
+	    key: 'borderCollision',
+	    value: function borderCollision() {
+	      if (this.player.headCenter[0] < this.player.headRadius - .3 * this.player.headRadius || this.player.headCenter[0] > this.width - this.player.headRadius + .3 * this.player.headRadius || this.player.headCenter[1] < this.player.headRadius - .3 * this.player.headRadius || this.player.headCenter[1] > this.height - this.player.headRadius + .3 * this.player.headRadius) {
+	        return true;
+	      }
+	    }
+	  }, {
+	    key: 'wallCollision',
+	    value: function wallCollision() {
+	      var _this2 = this;
+
+	      return this.walls.some(function (wall) {
+	        return _this2.player.headCenter[0] > wall.x - .7 * _this2.player.headRadius && _this2.player.headCenter[0] < wall.x + wall.width + .7 * _this2.player.headRadius && _this2.player.headCenter[1] > wall.y - .7 * _this2.player.headRadius && _this2.player.headCenter[1] < wall.y + wall.height + .7 * _this2.player.headRadius;
+	      });
+	    }
+	  }, {
+	    key: 'start',
+	    value: function start() {
+	      var _this3 = this;
+
+	      this.bindKeys();
+	      var animateCallback = function animateCallback() {
+	        _this3.ctx.clearRect(0, 0, 1000, 600);
+	        _this3.drawWalls();
+	        _this3.player.drawHead(_this3.ctx);
+	        _this3.player.drawTail(_this3.ctx);
+	        _this3.player.rotate();
+
+	        if (_this3.borderCollision() || _this3.wallCollision()) {
+	          console.log('collision');
+	        } else {
+	          requestAnimationFrame(animateCallback);
+	        }
+	      };
+
+	      animateCallback();
+	    }
+	  }]);
+
+	  return Maze;
+	}();
+
+	exports.default = Maze;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _lodash = __webpack_require__(2);
+
+	var _lodash2 = _interopRequireDefault(_lodash);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var WALL_CONSTANTS = {
+	  color: '#cdcdcd'
+	};
+
+	var Wall = function () {
+	  function Wall(location) {
+	    _classCallCheck(this, Wall);
+
+	    this.location = location;
+	    this.color = WALL_CONSTANTS.color;
+	    this.x = location[0];
+	    this.y = location[1];
+	    this.width = location[2];
+	    this.height = location[3];
+
+	    (0, _lodash2.default)(this, ['draw']);
+	  }
+
+	  _createClass(Wall, [{
+	    key: 'draw',
+	    value: function draw(ctx, color) {
+	      ctx.rect.apply(ctx, _toConsumableArray(this.location));
+	      ctx.fillStyle = color;
+	      ctx.fill();
+	    }
+	  }]);
+
+	  return Wall;
+	}();
+
+	exports.default = Wall;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var LEVELS = {
+	  1: {
+	    walls: [[320, 225, 350, 150]],
+	    endGoal: [980, 500, 100, 100],
+	    playerStart: [150, 150]
+	  }
+	};
+
+	exports.default = LEVELS;
+
+/***/ }
+/******/ ]);
