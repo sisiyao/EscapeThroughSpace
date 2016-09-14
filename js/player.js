@@ -48,13 +48,14 @@ class Player {
     ctx.arc(
       this.headCenter[0], this.headCenter[1], this.headRadius, 0, 2 * Math.PI, true
     );
+    ctx.closePath();
     ctx.fill();
   }
 
   initialTail () {
     let tail = [];
     let angle = 2 * Math.PI;
-    for (let i = 0; i <= 40 ; i++) {
+    for (let i = 0; i <= 25 ; i++) {
       angle += (2 * Math.PI) / 90;
       let point = this.pointOnOrbit(angle, this.center, this.radius);
       tail.push(point);
@@ -64,13 +65,14 @@ class Player {
 
   drawTail (ctx) {
     let radius = this.headRadius;
-    for (let i = 7; i <= 40; i += 9) {
+    for (let i = 7; i <= 22; i += 5) {
       radius *= 0.7;
       ctx.fillStyle = this.color;
       ctx.beginPath();
       ctx.arc(
         this.tail[i][0], this.tail[i][1], radius, 0, 2 * Math.PI, true
       );
+      ctx.closePath();
       ctx.fill();
     }
   }

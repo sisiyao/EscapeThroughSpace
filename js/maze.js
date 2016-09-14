@@ -9,10 +9,12 @@ class Maze {
     this.ctx = ctx;
     this.walls = LEVELS[level].walls.map(wall => new Wall(wall));
     this.endGoal = new Wall(LEVELS[level].endGoal);
+    this.finishText = LEVELS[level].finishText;
     this.width = width;
     this.height = height;
 
-    bindAll(this, ['drawWalls', 'borderCollision', 'wallCollision']);
+    bindAll(this, ['drawWalls', 'borderCollision', 'wallCollision',
+      'drawEndGoal', 'playerWon', 'writeFinish', 'drawMaze', 'step']);
   }
 
   bindKeys () {
@@ -27,7 +29,7 @@ class Maze {
   }
 
   drawEndGoal () {
-    this.endGoal.draw(this.ctx, '#cdcdcd');
+    this.endGoal.draw(this.ctx, '#329932');
   }
 
   borderCollision () {
@@ -56,23 +58,47 @@ class Maze {
     });
   }
 
+  playerWon () {
+    return (this.player.headCenter[0] >
+      this.endGoal.x + this.player.headRadius &&
+    this.player.headCenter[0] <
+      this.endGoal.x + this.endGoal.width - this.player.headRadius &&
+    this.player.headCenter[1] >
+      this.endGoal.y + this.player.headRadius &&
+    this.player.headCenter[1] <
+      this.endGoal.y + this.endGoal.height - this.player.headRadius);
+  }
+
+  writeFinish () {
+    this.ctx.font="24px Verdana";
+    this.ctx.fillStyle = "#ffffff";
+    this.ctx.fillText("F I N I S H", ...this.finishText);
+  }
+
+  drawMaze () {
+    this.ctx.clearRect(0, 0, 1000, 600);
+    this.drawEndGoal();
+    this.writeFinish();
+    this.drawWalls();
+    this.player.drawHead(this.ctx);
+    this.player.drawTail(this.ctx);
+    this.player.rotate();
+  }
+
+  step () {
+    this.drawMaze();
+    if (this.borderCollision() || this.wallCollision()) {
+      console.log('collision');
+    } else if (this.playerWon()) {
+      console.log('win');
+    } else {
+      requestAnimationFrame(this.step);
+    }
+  }
+
   start () {
     this.bindKeys();
-    const animateCallback = () => {
-      this.ctx.clearRect(0, 0, 1000, 600);
-      this.drawWalls();
-      this.player.drawHead(this.ctx);
-      this.player.drawTail(this.ctx);
-      this.player.rotate();
-
-      if (this.borderCollision() || this.wallCollision()) {
-        console.log('collision');
-      } else {
-        requestAnimationFrame(animateCallback);
-      }
-    };
-
-    animateCallback();
+    this.step();
   }
 }
 

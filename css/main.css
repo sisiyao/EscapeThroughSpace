@@ -1,7 +1,5 @@
 #canvas {
-  border: 20px solid #cdcdcd;
-  /*padding-left: 0;
-  padding-right: 0;*/
+  border: 40px solid #cdcdcd;
   margin: 0 auto;
   display: block;
   box-sizing: border-box;
