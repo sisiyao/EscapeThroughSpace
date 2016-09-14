@@ -1,10 +1,10 @@
 const LEVELS = {
   1: {
     walls: [
-      [0, 0, 650, 350]
+      [350, 0, 650, 350]
     ],
-    endGoal: [650, 0, 400, 100],
-    playerStart: [120, 480],
+    endGoal: [900, 350, 300, 250],
+    playerStart: [150, 100],
     finishText: [765, 60]
   },
   2: {

@@ -5,9 +5,25 @@
     <script type="application/javascript" src="./js/bundle.js"></script>
     <script src="./vendor/mousetrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="./css/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Monoton|Poppins" rel="stylesheet">
   </head>
 
   <body>
-    <canvas id="canvas"></canvas>
+    <div class='game'>
+      <div class='game-text'>
+        <div class='title'>Loopy Maze</div>
+        <div class='instructions'>
+          <h2>GOAL</h2>
+          <p class="divider">Reach the finish line without hitting any walls.</p>
+          <h2>HOW TO PLAY</h2>
+          <p class="divider">Tap the space bar to move forward. Hold down the space bar to spin the other way.
+            Hint: tap the space bar rapidly to move in a straight line</p>
+          <h2 class="start-text">PRESS ANY KEY TO START</h2>
+        </div>
+      </div>
+      <div id='wrapper'>
+        <canvas id="canvas"></canvas>
+      </div>
+    </div>
   </body>
 </html>

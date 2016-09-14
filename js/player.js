@@ -15,17 +15,17 @@ const PLAYER_CONSTANTS = {
 class Player {
   constructor (center) {
     this.center = center;
+    this.playerStart = center;
     this.radius = PLAYER_CONSTANTS.RADIUS;
     this.headCenter = this.pointOnOrbit(0, center, PLAYER_CONSTANTS.RADIUS);
     this.headRadius = PLAYER_CONSTANTS.HEAD_RADIUS;
     this.tail = this.initialTail();
     this.color = PLAYER_CONSTANTS.COLOR;
-    this.angle = 0;
+    this.angle = 2 * Math.PI;
     this.direction = 'counter-clockwise';
 
-    bindAll(this, ['drawHead', 'drawTail', 'rotate',
-    'switchAngles', 'calculateCenter', 'turnClockwise',
-    'turnCounterClockwise']);
+    bindAll(this, ['drawHead', 'drawTail', 'rotate', 'switchAngles',
+    'calculateCenter', 'turnClockwise', 'turnCounterClockwise']);
   }
 
   pointOnOrbit (angle, center, radius) {
@@ -55,8 +55,8 @@ class Player {
   initialTail () {
     let tail = [];
     let angle = 2 * Math.PI;
-    for (let i = 0; i <= 25 ; i++) {
-      angle += (2 * Math.PI) / 90;
+    for (let i = 0; i <= 22 ; i++) {
+      angle += (2 * Math.PI) / 80;
       let point = this.pointOnOrbit(angle, this.center, this.radius);
       tail.push(point);
     }
@@ -79,11 +79,11 @@ class Player {
 
   rotate () {
     if (this.direction === 'clockwise') {
-      this.angle = this.angle === 2 * Math.PI ? (2 * Math.PI) / 100 :
-        this.angle + (2 * Math.PI) / 80;
+      this.angle = (this.angle === 2 * Math.PI || this.angle === 0) ?
+        (2 * Math.PI) / 80 : this.angle + (2 * Math.PI) / 80;
     } else {
-      this.angle = this.angle === 0 ? (2 * Math.PI) - ((2 * Math.PI) / 100) :
-        this.angle - (2 * Math.PI) / 80;
+      this.angle = (this.angle === 2 * Math.PI || this.angle === 0) ?
+        (2 * Math.PI) - ((2 * Math.PI) / 80) : this.angle - (2 * Math.PI) / 80;
     }
 
     this.headCenter = this.pointOnOrbit(this.angle, this.center, this.radius);

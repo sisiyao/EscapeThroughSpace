@@ -4,7 +4,7 @@ import LEVELS from './levels';
 import bindAll from 'lodash.bindall';
 
 class Maze {
-  constructor (level, ctx, width, height) {
+  constructor (level, ctx, width, height, wrapper) {
     this.player = new Player(LEVELS[level].playerStart);
     this.ctx = ctx;
     this.walls = LEVELS[level].walls.map(wall => new Wall(wall));
@@ -12,6 +12,7 @@ class Maze {
     this.finishText = LEVELS[level].finishText;
     this.width = width;
     this.height = height;
+    this.wrapper = wrapper;
 
     bindAll(this, ['drawWalls', 'borderCollision', 'wallCollision',
       'drawEndGoal', 'playerWon', 'writeFinish', 'drawMaze', 'step']);
@@ -76,13 +77,24 @@ class Maze {
   }
 
   drawMaze () {
-    this.ctx.clearRect(0, 0, 1000, 600);
+    this.ctx.clearRect(0, 0, this.width, this.height);
     this.drawEndGoal();
     this.writeFinish();
     this.drawWalls();
+
+    if (this.player.center[0] !== this.player.playerStart[0] &&
+      this.player.center[1] !== this.player.playerStart[1]) {
+        this.moveMaze(...this.player.headCenter);
+    }
+
+    this.player.rotate();
     this.player.drawHead(this.ctx);
     this.player.drawTail(this.ctx);
-    this.player.rotate();
+  }
+
+  moveMaze (x, y) {
+    this.wrapper.scrollLeft = x - this.player.playerStart[0];
+    this.wrapper.scrollTop = y - this.player.playerStart[1];
   }
 
   step () {

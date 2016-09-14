@@ -54,11 +54,15 @@
 
 	document.addEventListener("DOMContentLoaded", function () {
 	  var canvas = document.getElementsByTagName("canvas")[0];
+	  var wrapper = document.getElementById('wrapper');
 	  canvas.width = 1000;
 	  canvas.height = 600;
 
 	  var ctx = canvas.getContext("2d");
-	  var maze = new _maze2.default(1, ctx, canvas.width, canvas.height);
+	  var maze = new _maze2.default(1, ctx, canvas.width, canvas.height, wrapper);
+	  maze.drawMaze();
+	  // wrapper.scrollTop = 640;
+	  // wrapper.scrollLeft = 270;
 	  maze.start();
 	});
 
@@ -97,7 +101,7 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var Maze = function () {
-	  function Maze(level, ctx, width, height) {
+	  function Maze(level, ctx, width, height, wrapper) {
 	    _classCallCheck(this, Maze);
 
 	    this.player = new _player2.default(_levels2.default[level].playerStart);
@@ -109,6 +113,7 @@
 	    this.finishText = _levels2.default[level].finishText;
 	    this.width = width;
 	    this.height = height;
+	    this.wrapper = wrapper;
 
 	    (0, _lodash2.default)(this, ['drawWalls', 'borderCollision', 'wallCollision', 'drawEndGoal', 'playerWon', 'writeFinish', 'drawMaze', 'step']);
 	  }
@@ -166,13 +171,24 @@
 	  }, {
 	    key: 'drawMaze',
 	    value: function drawMaze() {
-	      this.ctx.clearRect(0, 0, 1000, 600);
+	      this.ctx.clearRect(0, 0, this.width, this.height);
 	      this.drawEndGoal();
 	      this.writeFinish();
 	      this.drawWalls();
+
+	      if (this.player.center[0] !== this.player.playerStart[0] && this.player.center[1] !== this.player.playerStart[1]) {
+	        this.moveMaze.apply(this, _toConsumableArray(this.player.headCenter));
+	      }
+
+	      this.player.rotate();
 	      this.player.drawHead(this.ctx);
 	      this.player.drawTail(this.ctx);
-	      this.player.rotate();
+	    }
+	  }, {
+	    key: 'moveMaze',
+	    value: function moveMaze(x, y) {
+	      this.wrapper.scrollLeft = x - this.player.playerStart[0];
+	      this.wrapper.scrollTop = y - this.player.playerStart[1];
 	    }
 	  }, {
 	    key: 'step',
@@ -233,12 +249,13 @@
 	    _classCallCheck(this, Player);
 
 	    this.center = center;
+	    this.playerStart = center;
 	    this.radius = PLAYER_CONSTANTS.RADIUS;
 	    this.headCenter = this.pointOnOrbit(0, center, PLAYER_CONSTANTS.RADIUS);
 	    this.headRadius = PLAYER_CONSTANTS.HEAD_RADIUS;
 	    this.tail = this.initialTail();
 	    this.color = PLAYER_CONSTANTS.COLOR;
-	    this.angle = 0;
+	    this.angle = 2 * Math.PI;
 	    this.direction = 'counter-clockwise';
 
 	    (0, _lodash2.default)(this, ['drawHead', 'drawTail', 'rotate', 'switchAngles', 'calculateCenter', 'turnClockwise', 'turnCounterClockwise']);
@@ -273,8 +290,8 @@
 	    value: function initialTail() {
 	      var tail = [];
 	      var angle = 2 * Math.PI;
-	      for (var i = 0; i <= 25; i++) {
-	        angle += 2 * Math.PI / 90;
+	      for (var i = 0; i <= 22; i++) {
+	        angle += 2 * Math.PI / 80;
 	        var point = this.pointOnOrbit(angle, this.center, this.radius);
 	        tail.push(point);
 	      }
@@ -297,9 +314,9 @@
 	    key: 'rotate',
 	    value: function rotate() {
 	      if (this.direction === 'clockwise') {
-	        this.angle = this.angle === 2 * Math.PI ? 2 * Math.PI / 100 : this.angle + 2 * Math.PI / 80;
+	        this.angle = this.angle === 2 * Math.PI || this.angle === 0 ? 2 * Math.PI / 80 : this.angle + 2 * Math.PI / 80;
 	      } else {
-	        this.angle = this.angle === 0 ? 2 * Math.PI - 2 * Math.PI / 100 : this.angle - 2 * Math.PI / 80;
+	        this.angle = this.angle === 2 * Math.PI || this.angle === 0 ? 2 * Math.PI - 2 * Math.PI / 80 : this.angle - 2 * Math.PI / 80;
 	      }
 
 	      this.headCenter = this.pointOnOrbit(this.angle, this.center, this.radius);
@@ -1915,9 +1932,9 @@
 	});
 	var LEVELS = {
 	  1: {
-	    walls: [[0, 0, 650, 350]],
-	    endGoal: [650, 0, 400, 100],
-	    playerStart: [120, 480],
+	    walls: [[350, 0, 650, 350]],
+	    endGoal: [900, 350, 300, 250],
+	    playerStart: [150, 100],
 	    finishText: [765, 60]
 	  },
 	  2: {
