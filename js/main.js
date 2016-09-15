@@ -5,11 +5,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const wrapper = document.getElementById('wrapper');
   canvas.width = 1000;
   canvas.height = 600;
-
   const ctx = canvas.getContext("2d");
-  const maze = new Maze(1, ctx, canvas.width, canvas.height, wrapper);
+  const maze = new Maze(level, ctx, canvas.width, canvas.height, wrapper);
   maze.drawMaze();
-  // wrapper.scrollTop = 640;
-  // wrapper.scrollLeft = 270;
   maze.start();
+  Mousetrap.bind("enter", removeSplash.bind(null, ctx, canvas, wrapper, maze));
 });
+
+let level = 1;
+
+function removeSplash (ctx, canvas, wrapper, maze) {
+  console.log("here");
+  const splashes = document.querySelectorAll('.splash');
+  splashes.forEach(splash => {
+    splash.style.visibility = "hidden";
+  });
+  maze.bindKeys();
+  Mousetrap.unbind("enter");
+}

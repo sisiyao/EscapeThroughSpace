@@ -109,7 +109,6 @@ class Maze {
   }
 
   start () {
-    this.bindKeys();
     this.step();
   }
 }

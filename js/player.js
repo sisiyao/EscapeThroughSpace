@@ -9,7 +9,7 @@ const PLAYER_CONSTANTS = {
   RADIUS: 55,
   HEAD_RADIUS: 12,
   COLOR: '#FF0000',
-  // ORBIT_COLOR: '#cdcdcd'
+  ORBIT_COLOR: '#cdcdcd'
 };
 
 class Player {
@@ -33,16 +33,17 @@ class Player {
       center[1] + radius * Math.sin(angle)];
   }
 
-  // drawOrbit (ctx) {
-  //   ctx.fillStyle = PLAYER_CONSTANTS.ORBIT_COLOR;
-  //   ctx.beginPath();
-  //   ctx.arc(
-  //     this.center[0], this.center[1], this.radius, 0, 2 * Math.PI, true
-  //   );
-  //   ctx.fill();
-  // }
+  drawOrbit (ctx) {
+    ctx.fillStyle = PLAYER_CONSTANTS.ORBIT_COLOR;
+    ctx.beginPath();
+    ctx.arc(
+      this.center[0], this.center[1], this.radius, 0, 2 * Math.PI, true
+    );
+    ctx.fill();
+  }
 
   drawHead (ctx) {
+    // drawOrbit(ctx);
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(

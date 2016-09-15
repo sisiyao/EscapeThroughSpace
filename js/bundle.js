@@ -57,14 +57,24 @@
 	  var wrapper = document.getElementById('wrapper');
 	  canvas.width = 1000;
 	  canvas.height = 600;
-
 	  var ctx = canvas.getContext("2d");
-	  var maze = new _maze2.default(1, ctx, canvas.width, canvas.height, wrapper);
+	  var maze = new _maze2.default(level, ctx, canvas.width, canvas.height, wrapper);
 	  maze.drawMaze();
-	  // wrapper.scrollTop = 640;
-	  // wrapper.scrollLeft = 270;
 	  maze.start();
+	  Mousetrap.bind("enter", removeSplash.bind(null, ctx, canvas, wrapper, maze));
 	});
+
+	var level = 1;
+
+	function removeSplash(ctx, canvas, wrapper, maze) {
+	  console.log("here");
+	  var splashes = document.querySelectorAll('.splash');
+	  splashes.forEach(function (splash) {
+	    splash.style.visibility = "hidden";
+	  });
+	  maze.bindKeys();
+	  Mousetrap.unbind("enter");
+	}
 
 /***/ },
 /* 1 */
@@ -205,7 +215,6 @@
 	  }, {
 	    key: 'start',
 	    value: function start() {
-	      this.bindKeys();
 	      this.step();
 	    }
 	  }]);
@@ -241,7 +250,8 @@
 	var PLAYER_CONSTANTS = {
 	  RADIUS: 55,
 	  HEAD_RADIUS: 12,
-	  COLOR: '#FF0000'
+	  COLOR: '#FF0000',
+	  ORBIT_COLOR: '#cdcdcd'
 	};
 
 	var Player = function () {
@@ -266,19 +276,18 @@
 	    value: function pointOnOrbit(angle, center, radius) {
 	      return [center[0] + radius * Math.cos(angle), center[1] + radius * Math.sin(angle)];
 	    }
-
-	    // drawOrbit (ctx) {
-	    //   ctx.fillStyle = PLAYER_CONSTANTS.ORBIT_COLOR;
-	    //   ctx.beginPath();
-	    //   ctx.arc(
-	    //     this.center[0], this.center[1], this.radius, 0, 2 * Math.PI, true
-	    //   );
-	    //   ctx.fill();
-	    // }
-
+	  }, {
+	    key: 'drawOrbit',
+	    value: function drawOrbit(ctx) {
+	      ctx.fillStyle = PLAYER_CONSTANTS.ORBIT_COLOR;
+	      ctx.beginPath();
+	      ctx.arc(this.center[0], this.center[1], this.radius, 0, 2 * Math.PI, true);
+	      ctx.fill();
+	    }
 	  }, {
 	    key: 'drawHead',
 	    value: function drawHead(ctx) {
+	      // drawOrbit(ctx);
 	      ctx.fillStyle = this.color;
 	      ctx.beginPath();
 	      ctx.arc(this.headCenter[0], this.headCenter[1], this.headRadius, 0, 2 * Math.PI, true);
@@ -1934,13 +1943,14 @@
 	  1: {
 	    walls: [[350, 0, 650, 350]],
 	    endGoal: [900, 350, 300, 250],
-	    playerStart: [150, 100],
+	    playerStart: [165, 100],
 	    finishText: [765, 60]
 	  },
 	  2: {
-	    walls: [[0, 225, 600, 150]],
-	    endGoal: [0, 370, 80, 230],
-	    playerStart: [120, 120]
+	    walls: [[350, 0, 650, 350]],
+	    endGoal: [900, 350, 300, 250],
+	    playerStart: [165, 100],
+	    finishText: [765, 60]
 	  }
 	};
 
