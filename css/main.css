@@ -33,6 +33,7 @@
 .game {
   display: flex;
   flex-direction: row;
+  position: relative;
 }
 
 .game-text {
@@ -64,7 +65,7 @@
   padding: 5px;
 }
 
-.level-one, .level-two, .level-three{
+#level-splash, #win-splash, #lose-splash{
   position: absolute;
   z-index: 2;
   background-color: white;
@@ -78,13 +79,46 @@
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
   font-weight: bold;
+  visibility: hidden;
+}
+
+#level-splash {
   opacity: 0.8;
 }
 
-.level-two, .level-three {
-  visibility: hidden;
+#win-splash, #lose-splash {
+  opacity: 1;
+}
+
+#win-splash {
+  background-color: #e5e5ff;
 }
 
 .wrapper-box {
   padding-right: 30px;
+}
+
+.contact-links {
+  font-size: 30px;
+  min-height: 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  color: black;
+  font-size: 60px;
+}
+
+.fa {
+  padding: 0 40px;
+  z-index: 3;
+}
+
+.fa:first-of-type {
+  padding-right: 0;
+}
+
+.fa:hover {
+  color: blue;
+  cursor: pointer;
 }

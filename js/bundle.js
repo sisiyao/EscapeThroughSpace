@@ -44,30 +44,61 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	var _maze = __webpack_require__(1);
 
 	var _maze2 = _interopRequireDefault(_maze);
 
+	var _mazeview = __webpack_require__(6);
+
+	var _mazeview2 = _interopRequireDefault(_mazeview);
+
+	var _levels = __webpack_require__(5);
+
+	var _levels2 = _interopRequireDefault(_levels);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	var level = 0;
+
 	document.addEventListener("DOMContentLoaded", function () {
-	  var canvas = document.getElementsByTagName("canvas")[0];
-	  var wrapper = document.getElementById('wrapper');
-	  canvas.width = 1000;
-	  canvas.height = 600;
-	  var ctx = canvas.getContext("2d");
-	  var maze = new _maze2.default(level, ctx, canvas.width, canvas.height, wrapper);
-	  maze.drawMaze();
-	  maze.start();
-	  Mousetrap.bind("enter", removeSplash.bind(null, ctx, canvas, wrapper, maze));
+	  nextLevel();
 	});
 
-	var level = 1;
+	function newMaze() {
+	  var canvas = document.getElementsByTagName("canvas")[0];
+	  var wrapper = document.getElementById('wrapper');
+	  canvas.width = _levels2.default[level].mazeDimensions[0];
+	  canvas.height = _levels2.default[level].mazeDimensions[1];
+	  var ctx = canvas.getContext("2d");
+	  var maze = new _maze2.default(level, ctx, canvas.width, canvas.height, wrapper);
+	  return new _mazeview2.default(maze, ctx, level, nextLevel, resolveGame);
+	}
 
-	function removeSplash(ctx, canvas, wrapper, maze) {
-	  console.log("here");
+	function nextLevel() {
+	  level += 1;
+	  var levelText = document.getElementById('level-text');
+	  levelText.innerHTML = _levels2.default[level].levelText;
+	  var levelSplash = document.getElementById('level-splash');
+	  levelSplash.style.visibility = "visible";
+	  var maze = newMaze();
+	  maze.drawMaze();
+	  maze.start();
+	  Mousetrap.bind("enter", removeSplash.bind(null, maze));
+	}
+
+	function resolveGame(result) {
+	  level = result === 'win' ? 0 : level - 1;
+	  var splash = document.getElementById(result + '-splash');
+	  splash.style.visibility = "visible";
+	  Mousetrap.bind("enter", function () {
+	    splash.style.visibility = "hidden";
+	    nextLevel();
+	  });
+	}
+
+	function removeSplash(maze) {
 	  var splashes = document.querySelectorAll('.splash');
 	  splashes.forEach(function (splash) {
 	    splash.style.visibility = "hidden";
@@ -106,8 +137,6 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var Maze = function () {
@@ -120,21 +149,14 @@
 	      return new _wall2.default(wall);
 	    });
 	    this.endGoal = new _wall2.default(_levels2.default[level].endGoal);
-	    this.finishText = _levels2.default[level].finishText;
 	    this.width = width;
 	    this.height = height;
 	    this.wrapper = wrapper;
 
-	    (0, _lodash2.default)(this, ['drawWalls', 'borderCollision', 'wallCollision', 'drawEndGoal', 'playerWon', 'writeFinish', 'drawMaze', 'step']);
+	    (0, _lodash2.default)(this, ['drawWalls', 'borderCollision', 'wallCollision', 'drawEndGoal', 'playerWon']);
 	  }
 
 	  _createClass(Maze, [{
-	    key: 'bindKeys',
-	    value: function bindKeys() {
-	      Mousetrap.bind("space", this.player.turnClockwise, 'keydown');
-	      Mousetrap.bind("space", this.player.turnCounterClockwise, 'keyup');
-	    }
-	  }, {
 	    key: 'drawWalls',
 	    value: function drawWalls() {
 	      var _this = this;
@@ -146,7 +168,7 @@
 	  }, {
 	    key: 'drawEndGoal',
 	    value: function drawEndGoal() {
-	      this.endGoal.draw(this.ctx, '#329932');
+	      this.endGoal.draw(this.ctx, '#7fbf7f');
 	    }
 	  }, {
 	    key: 'borderCollision',
@@ -169,54 +191,6 @@
 	    value: function playerWon() {
 	      return this.player.headCenter[0] > this.endGoal.x + this.player.headRadius && this.player.headCenter[0] < this.endGoal.x + this.endGoal.width - this.player.headRadius && this.player.headCenter[1] > this.endGoal.y + this.player.headRadius && this.player.headCenter[1] < this.endGoal.y + this.endGoal.height - this.player.headRadius;
 	    }
-	  }, {
-	    key: 'writeFinish',
-	    value: function writeFinish() {
-	      var _ctx;
-
-	      this.ctx.font = "24px Verdana";
-	      this.ctx.fillStyle = "#ffffff";
-	      (_ctx = this.ctx).fillText.apply(_ctx, ["F I N I S H"].concat(_toConsumableArray(this.finishText)));
-	    }
-	  }, {
-	    key: 'drawMaze',
-	    value: function drawMaze() {
-	      this.ctx.clearRect(0, 0, this.width, this.height);
-	      this.drawEndGoal();
-	      this.writeFinish();
-	      this.drawWalls();
-
-	      if (this.player.center[0] !== this.player.playerStart[0] && this.player.center[1] !== this.player.playerStart[1]) {
-	        this.moveMaze.apply(this, _toConsumableArray(this.player.headCenter));
-	      }
-
-	      this.player.rotate();
-	      this.player.drawHead(this.ctx);
-	      this.player.drawTail(this.ctx);
-	    }
-	  }, {
-	    key: 'moveMaze',
-	    value: function moveMaze(x, y) {
-	      this.wrapper.scrollLeft = x - this.player.playerStart[0];
-	      this.wrapper.scrollTop = y - this.player.playerStart[1];
-	    }
-	  }, {
-	    key: 'step',
-	    value: function step() {
-	      this.drawMaze();
-	      if (this.borderCollision() || this.wallCollision()) {
-	        console.log('collision');
-	      } else if (this.playerWon()) {
-	        console.log('win');
-	      } else {
-	        requestAnimationFrame(this.step);
-	      }
-	    }
-	  }, {
-	    key: 'start',
-	    value: function start() {
-	      this.step();
-	    }
 	  }]);
 
 	  return Maze;
@@ -234,10 +208,7 @@
 	  value: true
 	});
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); // x = cx + r * cos(a)
-	// y = cy + r * sin(a)
-	// cx = x - r * cos(a)
-	// cy = y - r * sin(a)
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _lodash = __webpack_require__(3);
 
@@ -250,7 +221,7 @@
 	var PLAYER_CONSTANTS = {
 	  RADIUS: 55,
 	  HEAD_RADIUS: 12,
-	  COLOR: '#FF0000',
+	  COLOR: 'blue',
 	  ORBIT_COLOR: '#cdcdcd'
 	};
 
@@ -276,18 +247,19 @@
 	    value: function pointOnOrbit(angle, center, radius) {
 	      return [center[0] + radius * Math.cos(angle), center[1] + radius * Math.sin(angle)];
 	    }
-	  }, {
-	    key: 'drawOrbit',
-	    value: function drawOrbit(ctx) {
-	      ctx.fillStyle = PLAYER_CONSTANTS.ORBIT_COLOR;
-	      ctx.beginPath();
-	      ctx.arc(this.center[0], this.center[1], this.radius, 0, 2 * Math.PI, true);
-	      ctx.fill();
-	    }
+
+	    // drawOrbit (ctx) {
+	    //   ctx.fillStyle = PLAYER_CONSTANTS.ORBIT_COLOR;
+	    //   ctx.beginPath();
+	    //   ctx.arc(
+	    //     this.center[0], this.center[1], this.radius, 0, 2 * Math.PI, true
+	    //   );
+	    //   ctx.fill();
+	    // }
+
 	  }, {
 	    key: 'drawHead',
 	    value: function drawHead(ctx) {
-	      // drawOrbit(ctx);
 	      ctx.fillStyle = this.color;
 	      ctx.beginPath();
 	      ctx.arc(this.headCenter[0], this.headCenter[1], this.headRadius, 0, 2 * Math.PI, true);
@@ -1941,20 +1913,160 @@
 	});
 	var LEVELS = {
 	  1: {
-	    walls: [[350, 0, 650, 350]],
-	    endGoal: [900, 350, 300, 250],
-	    playerStart: [165, 100],
-	    finishText: [765, 60]
+	    walls: [[0, 300, 700, 500], [800, 0, 200, 200]],
+	    endGoal: [700, 700, 300, 100],
+	    playerStart: [135, 130],
+	    finishText: [800, 760],
+	    mazeDimensions: [1000, 800],
+	    levelText: "Level One: practice!"
 	  },
 	  2: {
-	    walls: [[350, 0, 650, 350]],
-	    endGoal: [900, 350, 300, 250],
+	    walls: [[350, 0, 1850, 300], [0, 370, 300, 930], [300, 670, 300, 630], [600, 920, 300, 380], [650, 300, 1550, 300], [940, 600, 1260, 250], [1140, 850, 50, 300], [1440, 1000, 50, 300], [1740, 850, 50, 300], [2040, 1050, 460, 250]],
+	    endGoal: [2200, 0, 300, 100],
 	    playerStart: [165, 100],
-	    finishText: [765, 60]
+	    finishText: [2300, 60],
+	    mazeDimensions: [2500, 1300],
+	    levelText: "Level Two"
+	  },
+	  3: {
+	    walls: [[450, 0, 200, 450], [0, 300, 250, 1200], [450, 625, 200, 450], [450, 1250, 2250, 250], [650, 625, 400, 200], [850, 0, 200, 650], [850, 975, 395, 150], [1450, 200, 200, 1050], [1250, 200, 200, 250], [1050, 575, 200, 250], [1650, 350, 1200, 250], [1850, 0, 50, 250], [2100, 100, 50, 250], [2350, 0, 50, 250], [2600, 100, 50, 250], [2850, 0, 150, 250], [2650, 800, 350, 270], [1650, 600, 750, 650]],
+	    endGoal: [2700, 1400, 300, 100],
+	    playerStart: [165, 100],
+	    finishText: [2800, 1460],
+	    mazeDimensions: [3000, 1500],
+	    levelText: "Level Three"
 	  }
 	};
 
 	exports.default = LEVELS;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _maze = __webpack_require__(1);
+
+	var _maze2 = _interopRequireDefault(_maze);
+
+	var _lodash = __webpack_require__(3);
+
+	var _lodash2 = _interopRequireDefault(_lodash);
+
+	var _levels = __webpack_require__(5);
+
+	var _levels2 = _interopRequireDefault(_levels);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var MazeView = function () {
+	  function MazeView(maze, ctx, level, nextLevelCallback, resolveGameCallback) {
+	    _classCallCheck(this, MazeView);
+
+	    this.maze = maze;
+	    this.level = level;
+	    this.ctx = ctx;
+	    this.player = maze.player;
+	    this.finishText = _levels2.default[level].finishText;
+	    this.nextLevel = nextLevelCallback;
+	    this.resolveGame = resolveGameCallback;
+
+	    (0, _lodash2.default)(this, ['drawMaze', 'step']);
+	  }
+
+	  _createClass(MazeView, [{
+	    key: 'bindKeys',
+	    value: function bindKeys() {
+	      Mousetrap.bind("space", this.player.turnClockwise, 'keydown');
+	      Mousetrap.bind("space", this.player.turnCounterClockwise, 'keyup');
+	    }
+	  }, {
+	    key: 'drawMaze',
+	    value: function drawMaze() {
+	      this.ctx.clearRect(0, 0, this.maze.width, this.maze.height);
+	      this.maze.drawEndGoal();
+	      this.writeFinish();
+	      this.maze.drawWalls();
+
+	      if (this.player.center[0] !== this.player.playerStart[0] && this.player.center[1] !== this.player.playerStart[1]) {
+	        this.moveMaze.apply(this, _toConsumableArray(this.player.headCenter));
+	      }
+
+	      this.player.rotate();
+	      this.player.drawHead(this.ctx);
+	      this.player.drawTail(this.ctx);
+	    }
+	  }, {
+	    key: 'moveMaze',
+	    value: function moveMaze(x, y) {
+	      this.maze.wrapper.scrollLeft = x - this.player.playerStart[0];
+	      this.maze.wrapper.scrollTop = y - this.player.playerStart[1];
+	    }
+	  }, {
+	    key: 'writeFinish',
+	    value: function writeFinish() {
+	      var _ctx;
+
+	      this.ctx.font = "24px Poppins";
+	      // this.ctx.fillStyle = "#ffffff";
+	      this.ctx.fillStyle = "black";
+
+	      (_ctx = this.ctx).fillText.apply(_ctx, ["F I N I S H"].concat(_toConsumableArray(this.finishText)));
+	    }
+	  }, {
+	    key: 'resetWindow',
+	    value: function resetWindow() {
+	      this.maze.wrapper.scrollLeft = 0;
+	      this.maze.wrapper.scrollTop = 0;
+	    }
+	  }, {
+	    key: 'freezeGame',
+	    value: function freezeGame(callback) {
+	      var _this = this;
+
+	      window.setTimeout(function () {
+	        callback();
+	        _this.resetWindow();
+	      }, 400);
+	    }
+	  }, {
+	    key: 'step',
+	    value: function step() {
+	      this.drawMaze();
+	      if (this.maze.borderCollision() || this.maze.wallCollision()) {
+	        this.freezeGame(this.resolveGame.bind(null, 'lose'));
+	      } else if (this.maze.playerWon()) {
+	        if (this.level === Math.max.apply(Math, Object.keys(_levels2.default))) {
+	          this.freezeGame(this.resolveGame.bind(null, 'win'));
+	        } else {
+	          this.freezeGame(this.nextLevel);
+	        }
+	      } else {
+	        requestAnimationFrame(this.step);
+	      }
+	    }
+	  }, {
+	    key: 'start',
+	    value: function start() {
+	      this.step();
+	    }
+	  }]);
+
+	  return MazeView;
+	}();
+
+	exports.default = MazeView;
 
 /***/ }
 /******/ ]);

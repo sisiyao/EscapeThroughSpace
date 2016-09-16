@@ -9,18 +9,12 @@ class Maze {
     this.ctx = ctx;
     this.walls = LEVELS[level].walls.map(wall => new Wall(wall));
     this.endGoal = new Wall(LEVELS[level].endGoal);
-    this.finishText = LEVELS[level].finishText;
     this.width = width;
     this.height = height;
     this.wrapper = wrapper;
 
     bindAll(this, ['drawWalls', 'borderCollision', 'wallCollision',
-      'drawEndGoal', 'playerWon', 'writeFinish', 'drawMaze', 'step']);
-  }
-
-  bindKeys () {
-    Mousetrap.bind("space", this.player.turnClockwise, 'keydown');
-    Mousetrap.bind("space", this.player.turnCounterClockwise, 'keyup');
+      'drawEndGoal', 'playerWon']);
   }
 
   drawWalls () {
@@ -30,7 +24,7 @@ class Maze {
   }
 
   drawEndGoal () {
-    this.endGoal.draw(this.ctx, '#329932');
+    this.endGoal.draw(this.ctx, '#7fbf7f');
   }
 
   borderCollision () {
@@ -68,48 +62,6 @@ class Maze {
       this.endGoal.y + this.player.headRadius &&
     this.player.headCenter[1] <
       this.endGoal.y + this.endGoal.height - this.player.headRadius);
-  }
-
-  writeFinish () {
-    this.ctx.font="24px Verdana";
-    this.ctx.fillStyle = "#ffffff";
-    this.ctx.fillText("F I N I S H", ...this.finishText);
-  }
-
-  drawMaze () {
-    this.ctx.clearRect(0, 0, this.width, this.height);
-    this.drawEndGoal();
-    this.writeFinish();
-    this.drawWalls();
-
-    if (this.player.center[0] !== this.player.playerStart[0] &&
-      this.player.center[1] !== this.player.playerStart[1]) {
-        this.moveMaze(...this.player.headCenter);
-    }
-
-    this.player.rotate();
-    this.player.drawHead(this.ctx);
-    this.player.drawTail(this.ctx);
-  }
-
-  moveMaze (x, y) {
-    this.wrapper.scrollLeft = x - this.player.playerStart[0];
-    this.wrapper.scrollTop = y - this.player.playerStart[1];
-  }
-
-  step () {
-    this.drawMaze();
-    if (this.borderCollision() || this.wallCollision()) {
-      console.log('collision');
-    } else if (this.playerWon()) {
-      console.log('win');
-    } else {
-      requestAnimationFrame(this.step);
-    }
-  }
-
-  start () {
-    this.step();
   }
 }
 

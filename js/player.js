@@ -1,14 +1,9 @@
-// x = cx + r * cos(a)
-// y = cy + r * sin(a)
-// cx = x - r * cos(a)
-// cy = y - r * sin(a)
-
 import bindAll from 'lodash.bindall';
 
 const PLAYER_CONSTANTS = {
   RADIUS: 55,
   HEAD_RADIUS: 12,
-  COLOR: '#FF0000',
+  COLOR: 'blue',
   ORBIT_COLOR: '#cdcdcd'
 };
 
@@ -33,17 +28,16 @@ class Player {
       center[1] + radius * Math.sin(angle)];
   }
 
-  drawOrbit (ctx) {
-    ctx.fillStyle = PLAYER_CONSTANTS.ORBIT_COLOR;
-    ctx.beginPath();
-    ctx.arc(
-      this.center[0], this.center[1], this.radius, 0, 2 * Math.PI, true
-    );
-    ctx.fill();
-  }
+  // drawOrbit (ctx) {
+  //   ctx.fillStyle = PLAYER_CONSTANTS.ORBIT_COLOR;
+  //   ctx.beginPath();
+  //   ctx.arc(
+  //     this.center[0], this.center[1], this.radius, 0, 2 * Math.PI, true
+  //   );
+  //   ctx.fill();
+  // }
 
   drawHead (ctx) {
-    // drawOrbit(ctx);
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(
