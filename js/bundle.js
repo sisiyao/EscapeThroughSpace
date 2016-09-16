@@ -2019,9 +2019,7 @@
 	      var _ctx;
 
 	      this.ctx.font = "24px Poppins";
-	      // this.ctx.fillStyle = "#ffffff";
 	      this.ctx.fillStyle = "black";
-
 	      (_ctx = this.ctx).fillText.apply(_ctx, ["F I N I S H"].concat(_toConsumableArray(this.finishText)));
 	    }
 	  }, {

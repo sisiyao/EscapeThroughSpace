@@ -43,9 +43,7 @@ class MazeView {
 
   writeFinish () {
     this.ctx.font="24px Poppins";
-    // this.ctx.fillStyle = "#ffffff";
     this.ctx.fillStyle = "black";
-
     this.ctx.fillText("F I N I S H", ...this.finishText);
   }
 

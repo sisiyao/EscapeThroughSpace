@@ -6,7 +6,7 @@ This game is inspired by the iOS app Ball Maze.
 
 [play here](https://sisiyao.github.io/LoopyMaze)
 
-![screenshot](./docs/screenshots/monster_attack.png)
+![screenshot](./docs/game.png)
 
 ## Gameplay
 
@@ -63,7 +63,24 @@ calculateCenter () {
 
 ### 2D Scrolling Camera View
 
+At any given point, the player can only see a portion of the maze. As the player moves through the maze, the "camera" follows the player and reveals the maze along the way. This increases the difficulty of the game since players can't anticipate what obstacles and paths are coming in the maze.
 
+![gif3](./docs/camera.gif)
+
+To achieve this effect, I wrapped the HTML5 Canvas in smaller div and set the overflow to hidden. Then, I used Element.scrollLeft and Element.scrollTop to scroll the div to where the player's was in the maze relative to its starting position.
+
+```HTML
+<div id='wrapper'>
+  <canvas id="canvas"></canvas>
+</div>
+```
+
+```JavaScript
+moveMaze (x, y) {
+  this.maze.wrapper.scrollLeft = x - this.player.playerStart[0];
+  this.maze.wrapper.scrollTop = y - this.player.playerStart[1];
+}
+```
 
 ### Other Features
 
