@@ -18,7 +18,7 @@ The goal is to finish all levels of the maze without hitting any walls. Here's t
 
 The player object consists of three distinct parts that are handled in separate methods: the orbit, the head, and the tail.
 
-![gif](./docs/spinny.gif)
+![gif1](./docs/spinny.gif)
 
 While the orbit is never physically rendered, the head and the tail are rendered as points traveling along this invisible orbit. To simulate the orbital movement, I move the head a couple degrees along the circle in counter-clockwise fashion each time requestAnimationFrame renders. The tail is simply a recent history of where the head has been, stored in an array. See the following method for how I implement the rotation:
 
@@ -41,6 +41,8 @@ rotate () {
 ```
 
 By default, the player object spins counter-clockwise in a static orbit. To make the player move forward or switch spinning directions, I bound a key event to a method that simply changes the center of the circle and the direction of spin.
+
+![gif2](./docs/move.gif)
 
 ```JavaScript
 turnCounterClockwise () {
