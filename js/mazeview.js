@@ -11,6 +11,11 @@ class MazeView {
     this.finishText = LEVELS[level].finishText;
     this.nextLevel = nextLevelCallback;
     this.resolveGame = resolveGameCallback;
+    if (level === 1) {
+      this.instructionText = LEVELS[level].instructionText;
+      this.thisWayText = LEVELS[level].thisWayText;
+      this.arrowText = LEVELS[level].arrowText;
+    }
 
     bindAll(this, ['drawMaze', 'step']);
   }
@@ -25,6 +30,11 @@ class MazeView {
     this.maze.drawEndGoal();
     this.writeFinish();
     this.maze.drawWalls();
+    if (this.level === 1) {
+      this.writeInstructionText();
+      this.writeArrowText();
+      this.writeThisWayText();
+    }
 
     if (this.player.center[0] !== this.player.playerStart[0] &&
       this.player.center[1] !== this.player.playerStart[1]) {
@@ -45,6 +55,24 @@ class MazeView {
     this.ctx.font="24px Poppins";
     this.ctx.fillStyle = "black";
     this.ctx.fillText("F I N I S H", ...this.finishText);
+  }
+
+  writeInstructionText () {
+    this.ctx.font="16px Poppins";
+    this.ctx.fillStyle = "black";
+    this.ctx.fillText("Tap the SPACE BAR to move through the maze", ...this.instructionText)
+  }
+
+  writeArrowText () {
+    this.ctx.font="32px Poppins";
+    this.ctx.fillStyle = "gray";
+    this.ctx.fillText("--->", ...this.arrowText);
+  }
+
+  writeThisWayText () {
+    this.ctx.font="16px Poppins";
+    this.ctx.fillStyle = "gray";
+    this.ctx.fillText("THIS WAY", ...this.thisWayText);
   }
 
   resetWindow () {

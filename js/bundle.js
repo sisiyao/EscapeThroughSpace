@@ -1915,10 +1915,13 @@
 	  1: {
 	    walls: [[0, 300, 700, 500], [800, 0, 200, 200]],
 	    endGoal: [700, 700, 300, 100],
-	    playerStart: [135, 130],
+	    playerStart: [135, 150],
 	    finishText: [800, 760],
 	    mazeDimensions: [1000, 800],
-	    levelText: "Level One: practice!"
+	    levelText: "Level One: practice!",
+	    instructionText: [0, 340],
+	    thisWayText: [350, 160],
+	    arrowText: [350, 190]
 	  },
 	  2: {
 	    walls: [[350, 0, 1850, 300], [0, 370, 300, 930], [300, 670, 300, 630], [600, 920, 300, 380], [650, 300, 1550, 300], [940, 600, 1260, 250], [1140, 850, 50, 300], [1440, 1000, 50, 300], [1740, 850, 50, 300], [2040, 1050, 460, 250]],
@@ -1929,7 +1932,7 @@
 	    levelText: "Level Two"
 	  },
 	  3: {
-	    walls: [[450, 0, 200, 450], [0, 300, 250, 1200], [450, 625, 200, 450], [450, 1250, 2250, 250], [650, 625, 400, 200], [850, 0, 200, 650], [850, 975, 395, 150], [1450, 200, 200, 1050], [1250, 200, 200, 250], [1050, 575, 200, 250], [1650, 350, 1200, 250], [1850, 0, 50, 250], [2100, 100, 50, 250], [2350, 0, 50, 250], [2600, 100, 50, 250], [2850, 0, 150, 250], [2650, 800, 350, 270], [1650, 600, 750, 650]],
+	    walls: [[450, 0, 100, 400], [0, 300, 250, 1200], [450, 625, 200, 400], [500, 1250, 2200, 250], [650, 625, 400, 200], [850, 0, 200, 650], [880, 990, 325, 100], [1450, 200, 200, 1050], [1350, 200, 100, 250], [1050, 575, 100, 250], [1650, 350, 1000, 250], [1850, 0, 50, 200], [2100, 150, 50, 200], [2350, 0, 50, 200], [2600, 150, 50, 200], [2850, 0, 150, 200], [2750, 800, 250, 270], [1650, 600, 750, 650]],
 	    endGoal: [2700, 1400, 300, 100],
 	    playerStart: [165, 100],
 	    finishText: [2800, 1460],
@@ -1981,6 +1984,11 @@
 	    this.finishText = _levels2.default[level].finishText;
 	    this.nextLevel = nextLevelCallback;
 	    this.resolveGame = resolveGameCallback;
+	    if (level === 1) {
+	      this.instructionText = _levels2.default[level].instructionText;
+	      this.thisWayText = _levels2.default[level].thisWayText;
+	      this.arrowText = _levels2.default[level].arrowText;
+	    }
 
 	    (0, _lodash2.default)(this, ['drawMaze', 'step']);
 	  }
@@ -1998,6 +2006,11 @@
 	      this.maze.drawEndGoal();
 	      this.writeFinish();
 	      this.maze.drawWalls();
+	      if (this.level === 1) {
+	        this.writeInstructionText();
+	        this.writeArrowText();
+	        this.writeThisWayText();
+	      }
 
 	      if (this.player.center[0] !== this.player.playerStart[0] && this.player.center[1] !== this.player.playerStart[1]) {
 	        this.moveMaze.apply(this, _toConsumableArray(this.player.headCenter));
@@ -2021,6 +2034,33 @@
 	      this.ctx.font = "24px Poppins";
 	      this.ctx.fillStyle = "black";
 	      (_ctx = this.ctx).fillText.apply(_ctx, ["F I N I S H"].concat(_toConsumableArray(this.finishText)));
+	    }
+	  }, {
+	    key: 'writeInstructionText',
+	    value: function writeInstructionText() {
+	      var _ctx2;
+
+	      this.ctx.font = "16px Poppins";
+	      this.ctx.fillStyle = "black";
+	      (_ctx2 = this.ctx).fillText.apply(_ctx2, ["Tap the SPACE BAR to move through the maze"].concat(_toConsumableArray(this.instructionText)));
+	    }
+	  }, {
+	    key: 'writeArrowText',
+	    value: function writeArrowText() {
+	      var _ctx3;
+
+	      this.ctx.font = "32px Poppins";
+	      this.ctx.fillStyle = "gray";
+	      (_ctx3 = this.ctx).fillText.apply(_ctx3, ["--->"].concat(_toConsumableArray(this.arrowText)));
+	    }
+	  }, {
+	    key: 'writeThisWayText',
+	    value: function writeThisWayText() {
+	      var _ctx4;
+
+	      this.ctx.font = "16px Poppins";
+	      this.ctx.fillStyle = "gray";
+	      (_ctx4 = this.ctx).fillText.apply(_ctx4, ["THIS WAY"].concat(_toConsumableArray(this.thisWayText)));
 	    }
 	  }, {
 	    key: 'resetWindow',
